@@ -1,9 +1,6 @@
 # Hacer scrapping the https://eurogamer.es
-# TIENE TRUCO
 # Obtener un CSV con fecha, titular y tipo de contenido
 # Obtener 50 noticias
-# Revisar bien el contenido y el HTML de la página
-# Ser responsable (aplicar delay entre peticiones, no petar demasiado)
 
 import requests
 from bs4 import BeautifulSoup
@@ -29,7 +26,9 @@ with open('./games.csv', "w", newline="", encoding="utf-8") as file:
             tipo = quote.find("div", "archive__type").get_text().strip()
             # print("Artículo")
             # print(f"fecha: {fecha}")
-            # print(f"autor: {autor}")
+            # print(f"titulo: {titulo}")
             # print(f"tipo: {tipo}")
+            if titulo.find("|") != -1:
+                titulo = titulo.split("|")[1].strip()
             writer.writerow([fecha,titulo,tipo])
         time.sleep(0.5)
