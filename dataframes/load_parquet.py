@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import datetime as dt
 
 # Cargar datos
 df_parquet = pd.read_parquet("yellow_tripdata_2025-11.parquet")
@@ -10,6 +11,15 @@ df_parquet = pd.read_parquet("yellow_tripdata_2025-11.parquet")
 print("=" * 60)
 print("INFORMACIÓN GENERAL DEL DATASET")
 print("=" * 60)
+
+# Columnas con tipos extraños: passenger_count, RatecodeID, store_and_fwd_flag, payment_type, tpep_pickup_datetime, tpep_dropoff_datetime
+# Transformación de tipos
+df_parquet['store_and_fwd_flag'] = df_parquet['store_and_fwd_flag'].map({'Y':True,'N':False}).astype('boolean')
+df_parquet['tpep_pickup_datetime'] = df_parquet['tpep_pickup_datetime'].dt.tz_localize('America/New_york', ambiguous="NaT").dt.tz_convert('UTC')
+df_parquet['tpep_dropoff_datetime'] = df_parquet['tpep_dropoff_datetime'].dt.tz_localize('America/New_york', ambiguous="NaT").dt.tz_convert('UTC')
+
+# Añadir columnas derivadas
+df_parquet['duracion'] = df_parquet['tpep_dropoff_datetime'] - df_parquet['tpep_pickup_datetime']
 
 print("\nHead:")
 print(df_parquet.head())
@@ -22,6 +32,12 @@ print(df_parquet.dtypes)
 
 print("\nValores faltantes:")
 print(df_parquet.isnull().sum())
+
+print(df_parquet["store_and_fwd_flag"].unique())
+print(df_parquet["congestion_surcharge"].unique())
+print(df_parquet["improvement_surcharge"].unique())
+print(df_parquet["payment_type"].unique())
+
 
 # ============= ESTADÍSTICAS DESCRIPTIVAS =============
 print("\n" + "=" * 60)
@@ -61,10 +77,12 @@ print(f"  MEDIAN: {df_parquet['total_amount'].median():.2f}")
 
 # ============= TOP 10 VIAJES MÁS LARGOS =============
 print("\n" + "=" * 60)
-print("TOP 10 VIAJES MÁS LARGOS")
+print("TOP 30 VIAJES MÁS LARGOS")
 print("=" * 60)
 
-top_10_longest = df_parquet.nsmallest(30, 'total_amount')
+print(df_parquet[df_parquet["payment_type"] == 0].isna().mean())
+
+top_10_longest = df_parquet.nlargest(30, 'trip_distance')
 print("\n", top_10_longest)
 
 # ============= VISUALIZACIONES =============
@@ -314,4 +332,5 @@ print(f"  Máximo: {df_parquet['tpep_duration'].max():.2f} min")
 print("\n" + "=" * 80)
 print("ANÁLISIS COMPLETADO")
 print("=" * 80)
+
 
