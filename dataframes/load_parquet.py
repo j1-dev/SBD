@@ -120,3 +120,10 @@ print(taxis['trip_distance'].quantile([0.25, 0.5, 0.75, 0.95, 0.99, 1]))
 print('\nCruce de variables')
 print(taxis[['trip_distance', 'duracion']].describe())
 print(taxis.groupby('payment_type')['tip_amount'].mean())
+
+# Hipotesis: Los trayectos nocturnos son mas largos
+# Define nighttime as 21:00 (9 PM) to 06:00 (6 AM)
+taxis['is_night'] = taxis['tpep_pickup_datetime'].dt.hour.between(21, 23) | taxis['tpep_pickup_datetime'].dt.hour.between(0, 5)
+
+print(taxis.groupby('is_night')['trip_distance'].mean())
+print(taxis.groupby('is_night')['trip_distance_km'].agg(['count', 'mean', 'median']))
