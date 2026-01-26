@@ -123,7 +123,17 @@ print(taxis.groupby('payment_type')['tip_amount'].mean())
 
 # Hipotesis: Los trayectos nocturnos son mas largos
 # Define nighttime as 21:00 (9 PM) to 06:00 (6 AM)
+print('\n# Hipotesis: Los trayectos nocturnos son mas largos')
+
 taxis['is_night'] = taxis['tpep_pickup_datetime'].dt.hour.between(21, 23) | taxis['tpep_pickup_datetime'].dt.hour.between(0, 5)
 
 print(taxis.groupby('is_night')['trip_distance'].mean())
 print(taxis.groupby('is_night')['trip_distance_km'].agg(['count', 'mean', 'median']))
+
+# Hipotesis: Cuando la distancia aumenta, la dispersión de la duración también aumenta
+# Definir que es un trayecto corto y largo
+# Agrupar y ver los rangos en los que se mueve la variable escogida (duración)
+print('\n# Hipotesis: Cuando la distancia aumenta, la dispersión de la duración también aumenta')
+
+taxis['is_long'] = taxis['trip_distance_km'] > taxis['trip_distance_km'].mean()
+print(taxis.groupby('is_long')['duracion'].std())
